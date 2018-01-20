@@ -101,6 +101,7 @@ public class ApiController {
             final int shard = o.getInt("shard_id");
             logger.info("Shard: " + shard);
             final String guild = o.getString("guild_id");
+            // TODO: Store and clean up the handle and etc
             final AudioManager audioManager = coreManager.getCore(bot, shard).getAudioManager(guild);
             audioManager.closeAudioConnection();
             map.put("disconnected", true);

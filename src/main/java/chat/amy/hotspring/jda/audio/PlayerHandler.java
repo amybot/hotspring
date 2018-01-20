@@ -45,6 +45,11 @@ public class PlayerHandler extends AudioEventAdapter implements AudioSendHandler
     }
     
     @Override
+    public boolean isOpus() {
+        return true;
+    }
+    
+    @Override
     public void onTrackStart(final AudioPlayer player, final AudioTrack track) {
         logger.info("Starting track: " + track.getInfo());
     }
