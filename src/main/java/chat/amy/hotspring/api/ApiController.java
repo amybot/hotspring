@@ -2,9 +2,8 @@ package chat.amy.hotspring.api;
 
 import chat.amy.hotspring.data.EventQueue;
 import chat.amy.hotspring.data.TrackContext;
-import chat.amy.hotspring.data.event.TrackEvent;
-import chat.amy.hotspring.data.event.TrackEvent.Type;
 import chat.amy.hotspring.jda.CoreManager;
+import chat.amy.hotspring.jda.HotspringVSU;
 import chat.amy.hotspring.jda.audio.PlayerHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -12,6 +11,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.manager.AudioManager;
+import net.dv8tion.jda.utils.SimpleLog;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +26,18 @@ import java.util.Map;
  * @author amy
  * @since 1/17/18.
  */
+@SuppressWarnings("unused")
 @RestController
 public class ApiController {
     @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
+    
+    static {
+        //noinspection UnnecessarilyQualifiedInnerClassAccess
+        SimpleLog.LEVEL = SimpleLog.Level.DEBUG;
+        System.out.println("JDA-A LOGS: " + SimpleLog.LEVEL);
+    }
+    
     @Value("${version}")
     private String version;
     @Autowired
@@ -64,11 +72,12 @@ public class ApiController {
             final JSONObject o = new JSONObject(body);
             final String bot = o.getString("bot_id");
             final int shard = o.getInt("shard_id");
+            logger.info("Shard: " + shard);
             final String session = o.getString("session");
             final JSONObject vsu = o.getJSONObject("vsu");
-            coreManager.getCore(bot, shard).provideVoiceServerUpdate(session, vsu);
+            HotspringVSU.acceptVSU(coreManager.getCore(bot, shard), session, vsu);
             map.put("connected", true);
-        } catch(Exception e) {
+        } catch(final Exception e) {
             map.put("connected", false);
             map.put("error", e);
         }
@@ -90,11 +99,12 @@ public class ApiController {
             final JSONObject o = new JSONObject(body);
             final String bot = o.getString("bot_id");
             final int shard = o.getInt("shard_id");
+            logger.info("Shard: " + shard);
             final String guild = o.getString("guild_id");
             final AudioManager audioManager = coreManager.getCore(bot, shard).getAudioManager(guild);
             audioManager.closeAudioConnection();
             map.put("disconnected", true);
-        } catch(Exception e) {
+        } catch(final Exception e) {
             map.put("disconnected", false);
             map.put("error", e);
         }
@@ -123,49 +133,50 @@ public class ApiController {
             final int shard = o.getInt("shard_id");
             final String guild = o.getString("guild_id");
             final String channel = o.getString("channel_id");
+            logger.info("Shard: " + shard);
             logger.info("Attempting load...");
-            new Thread(() -> {
-                PlayerHandler.AUDIO_PLAYER_MANAGER.loadItem(url, new AudioLoadResultHandler() {
-                    @Override
-                    public void trackLoaded(final AudioTrack audioTrack) {
-                        logger.info("Track loaded! woo!");
-                        final AudioPlayer audioPlayer = PlayerHandler.AUDIO_PLAYER_MANAGER.createPlayer();
-                        logger.info("Created player.");
-                        final PlayerHandler playerHandler = new PlayerHandler(audioPlayer);
-                        logger.info("Created handle");
-                        coreManager.getCore(bot, shard).getAudioManager(guild).setSendingHandler(playerHandler);
-                        logger.info("Set up core");
-                        audioPlayer.addListener(playerHandler);
-                        logger.info("Set up listener");
-                        audioPlayer.playTrack(audioTrack);
-                        logger.info("Should be playing!");
-                        TrackContext ctx = new TrackContext(audioTrack.getInfo(), guild, channel);
-                        //queue.queue(new TrackEvent(Type.AUDIO_TRACK_START, ctx));
-                    }
-        
-                    @Override
-                    public void playlistLoaded(final AudioPlaylist audioPlaylist) {
-                        // TODO
-                        logger.info("Playlist!?");
-                    }
-        
-                    @Override
-                    public void noMatches() {
-                        // TODO
-                        logger.info("No matches :^(");
-                    }
-        
-                    @Override
-                    public void loadFailed(final FriendlyException e) {
-                        // TODO
-                        logger.warn(":fire:");
-                        e.printStackTrace();
-                    }
-                });
-            }).start();
+            //noinspection AnonymousInnerClassWithTooManyMethods
+            new Thread(() -> PlayerHandler.AUDIO_PLAYER_MANAGER.loadItem(url, new AudioLoadResultHandler() {
+                @Override
+                public void trackLoaded(final AudioTrack audioTrack) {
+                    logger.info("Track loaded! woo!");
+                    final AudioPlayer audioPlayer = PlayerHandler.AUDIO_PLAYER_MANAGER.createPlayer();
+                    logger.info("Created player.");
+                    final PlayerHandler playerHandler = new PlayerHandler(audioPlayer);
+                    logger.info("Created handle");
+                    audioPlayer.addListener(playerHandler);
+                    logger.info("Set up listener");
+                    coreManager.getCore(bot, shard).getAudioManager(guild).setSendingHandler(playerHandler);
+                    logger.info("Set up core");
+                    audioPlayer.setVolume(10);
+                    audioPlayer.playTrack(audioTrack);
+                    logger.info("Should be playing!");
+                    final TrackContext ctx = new TrackContext(audioTrack.getInfo(), guild, channel);
+                    //queue.queue(new TrackEvent(Type.AUDIO_TRACK_START, ctx));
+                }
+                
+                @Override
+                public void playlistLoaded(final AudioPlaylist audioPlaylist) {
+                    // TODO
+                    logger.info("Playlist!?");
+                }
+                
+                @Override
+                public void noMatches() {
+                    // TODO
+                    logger.info("No matches :^(");
+                }
+                
+                @Override
+                public void loadFailed(final FriendlyException e) {
+                    // TODO
+                    logger.warn(":fire:");
+                    e.printStackTrace();
+                }
+            })).start();
             logger.info("Done?");
             map.put("playing", true);
-        } catch(Exception e) {
+        } catch(final Exception e) {
             map.put("playing", false);
             map.put("error", e);
         }

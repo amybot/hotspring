@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.github.dv8fromtheworld</groupId>
             <artifactId>JDA-Audio</artifactId>
-            <version>98ec94fed7</version>
+            <version>7a3f9d40a32b74b6e85e0e0c8f9a051f004b5584</version>
         </dependency>
     </dependencies>
 
@@ -93,6 +93,4 @@
             </plugin>
         </plugins>
     </build>
-
-
 </project>

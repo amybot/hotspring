@@ -52,6 +52,7 @@ public class PlayerHandler extends AudioEventAdapter implements AudioSendHandler
     @Override
     public void onTrackEnd(final AudioPlayer player, final AudioTrack track, final AudioTrackEndReason endReason) {
         logger.info("Ending track: " + track.getInfo());
+        System.out.println("End reason: " + endReason);
     }
     
     @Override

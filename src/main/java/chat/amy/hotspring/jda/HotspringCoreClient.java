@@ -28,18 +28,18 @@ public class HotspringCoreClient implements CoreClient {
     @Override
     public boolean inGuild(final String s) {
         // TODO: Send this from the backend
-        return false;
+        return true;
     }
     
     @Override
     public boolean voiceChannelExists(final String s, final String s1) {
         // TODO: Send this from the backend
-        return false;
+        return true;
     }
     
     @Override
     public boolean hasPermissionInChannel(final String s, final String s1, final long l) {
         // TODO: Send this from the backend
-        return false;
+        return true;
     }
 }
