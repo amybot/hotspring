@@ -21,13 +21,12 @@ When sending a REST request to a hotspring server, you need to send a track cont
     "rest of event": "goes here"
 }
 ```
+Note that this field will be omitted in all per-endpoint examples.
 
-`channel_id` is NOT the id of the voice channel, but is the id of the ***text*** channel that the request came from. 
+`channel_id` is ***NOT*** the id of the voice channel, but is the id of the ***TEXT*** channel that the request came from. 
 DO NOT MESS THIS UP. If a request didn't come from a text channel for whatever reason, you should provide some default value, 
 since this is used in playlist management. No guarantees are made as to what happens when you don't fill this out. 
 Here there be monsters. 
-
-Note that this field will be omitted in all per-endpoint examples.
 
 ---
 
