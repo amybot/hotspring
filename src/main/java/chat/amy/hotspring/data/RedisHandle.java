@@ -21,7 +21,7 @@ import java.util.Optional;
 @SuppressWarnings({"unchecked", "unused"})
 @Repository
 public class RedisHandle {
-    private static final String EVENT_QUEUE = Optional.ofNullable(System.getenv("EVENT_QUEUE")).orElse("event-queueTrackEvent");
+    private static final String EVENT_QUEUE = Optional.ofNullable(System.getenv("EVENT_QUEUE")).orElse("event-queue");
     @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(RedisHandle.class);
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -38,10 +38,13 @@ public class RedisHandle {
     }
     
     public void queueTrackEvent(final TrackEvent event) {
-        queue(EVENT_QUEUE, event);
+        if(event.getD().getCtx() != null) {
+            queue(EVENT_QUEUE, event);
+        }
     }
     
     public void queue(final String queue, final Object data) {
+        logger.info("Queueing to " + queue + ": " + serialize(data));
         listOps.rightPush(queue, serialize(data));
     }
     

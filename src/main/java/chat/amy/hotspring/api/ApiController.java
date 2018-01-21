@@ -35,7 +35,10 @@ public class ApiController {
     static {
         //noinspection UnnecessarilyQualifiedInnerClassAccess
         SimpleLog.LEVEL = SimpleLog.Level.DEBUG;
-        System.out.println("JDA-A LOGS: " + SimpleLog.LEVEL);
+        // TODO: Is this stupid?
+        // We hold on to the players forever, because each handle just holds a
+        // single player that all of the guild's tracks go through.
+        PlayerHandle.AUDIO_PLAYER_MANAGER.setPlayerCleanupThreshold(Long.MAX_VALUE);
     }
     
     @Value("${version}")
@@ -47,8 +50,6 @@ public class ApiController {
     
     @RequestMapping("/")
     public Map<String, String> index() {
-        System.out.println(coreManager);
-        System.out.println(PlayerHandle.AUDIO_PLAYER_MANAGER);
         final Map<String, String> map = new HashMap<>();
         map.put("version", version);
         return map;
@@ -58,7 +59,7 @@ public class ApiController {
     @RequestMapping(value = "/connection/open", method = RequestMethod.POST)
     public Map<String, Object> openConnection(@RequestBody final String body) {
         final JSONObject data = new JSONObject(body);
-        final ApiContext ctx = ApiContext.fromContext(new JSONObject(data.getJSONObject("ctx")));
+        final ApiContext ctx = ApiContext.fromContext(data.getJSONObject("ctx"));
         
         ManagedGuild.get(ctx.getGuild(), queue)
                 .openConnection(coreManager.getCore(ctx.getBotId(), ctx.getShardId()),
@@ -71,7 +72,7 @@ public class ApiController {
     @RequestMapping(value = "/connection/close", method = RequestMethod.POST)
     public Map<String, Object> closeConnection(@RequestBody final String body) {
         final JSONObject data = new JSONObject(body);
-        final ApiContext ctx = ApiContext.fromContext(new JSONObject(data.getJSONObject("ctx")));
+        final ApiContext ctx = ApiContext.fromContext(data.getJSONObject("ctx"));
         
         ManagedGuild.get(ctx.getGuild(), queue).closeConnection(coreManager.getCore(ctx.getBotId(), ctx.getShardId()));
         
@@ -82,7 +83,7 @@ public class ApiController {
     @RequestMapping(value = "/connection/track/play", method = RequestMethod.POST)
     public Map<String, Object> playTrack(@RequestBody final String body) {
         final JSONObject data = new JSONObject(body);
-        final ApiContext ctx = ApiContext.fromContext(new JSONObject(data.getJSONObject("ctx")));
+        final ApiContext ctx = ApiContext.fromContext(data.getJSONObject("ctx"));
         final Core core = coreManager.getCore(ctx.getBotId(), ctx.getShardId());
         ManagedGuild.get(ctx.getGuild(), queue).playTrack(core, ctx, data.getString("url"), DIRECT_PLAY);
         
@@ -93,7 +94,7 @@ public class ApiController {
     @RequestMapping(value = "/connection/track/queue", method = RequestMethod.POST)
     public Map<String, Object> queueTrack(@RequestBody final String body) {
         final JSONObject data = new JSONObject(body);
-        final ApiContext ctx = ApiContext.fromContext(new JSONObject(data.getJSONObject("ctx")));
+        final ApiContext ctx = ApiContext.fromContext(data.getJSONObject("ctx"));
         final Core core = coreManager.getCore(ctx.getBotId(), ctx.getShardId());
         ManagedGuild.get(ctx.getGuild(), queue).playTrack(core, ctx, data.getString("url"), QUEUE);
         
@@ -104,7 +105,7 @@ public class ApiController {
     @RequestMapping(value = "/connection/track/pause", method = RequestMethod.POST)
     public Map<String, Object> pauseTrack(@RequestBody final String body) {
         final JSONObject data = new JSONObject(body);
-        final ApiContext ctx = ApiContext.fromContext(new JSONObject(data.getJSONObject("ctx")));
+        final ApiContext ctx = ApiContext.fromContext(data.getJSONObject("ctx"));
         ManagedGuild.get(ctx.getGuild(), queue).pauseTrack();
         queue.queueTrackEvent(new TrackEvent(Type.AUDIO_TRACK_PAUSE, ctx,
                 ManagedGuild.get(ctx.getGuild(), queue).getHandle()

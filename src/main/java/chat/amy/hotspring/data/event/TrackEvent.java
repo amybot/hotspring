@@ -11,8 +11,18 @@ import lombok.Value;
 @Value
 public class TrackEvent {
     private final Type t;
-    private final ApiContext ctx;
-    private final AudioTrackInfo info;
+    private final TrackData d;
+    
+    public TrackEvent(Type type, ApiContext ctx, AudioTrackInfo info) {
+        t = type;
+        d = new TrackData(ctx, info);
+    }
+    
+    @Value
+    public static final class TrackData {
+        private final ApiContext ctx;
+        private final AudioTrackInfo info;
+    }
     
     public enum Type {
         /**

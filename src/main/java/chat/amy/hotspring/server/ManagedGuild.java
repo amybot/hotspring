@@ -13,6 +13,8 @@ import lombok.Getter;
 import net.dv8tion.jda.Core;
 import net.dv8tion.jda.manager.AudioManager;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,6 +33,7 @@ import static chat.amy.hotspring.data.event.TrackEvent.Type.*;
 @SuppressWarnings("unused")
 public final class ManagedGuild {
     private static final Map<String, ManagedGuild> MANAGED_GUILDS = new ConcurrentHashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(ManagedGuild.class);
     @Getter
     private final String guildId;
     @Getter
@@ -69,6 +72,7 @@ public final class ManagedGuild {
     }
     
     public void closeConnection(final Core core) {
+        handle.getAudioPlayer().stopTrack();
         getAudioManager(core).closeAudioConnection();
     }
     
@@ -88,21 +92,20 @@ public final class ManagedGuild {
                 // Check if it's a YT track
                 if(domainName.equalsIgnoreCase("youtube.com")) {
                     // Valid track, do something
-                    loadTrackFromURL(mode, ctx, track);
+                    loadTrackFromURL(core, mode, ctx, track);
                 } else {
                     // Invalid track
-                    
                     // TODO: This will bork radio probably
                     queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_INVALID, ctx, null));
                 }
             } catch(final URISyntaxException e) {
                 // Not a valid URL, search YT
-                loadTrackFromSearch(mode, ctx, track);
+                loadTrackFromSearch(core, mode, ctx, track);
             }
         });
     }
     
-    private void loadTrackFromURL(final PlayMode mode, final ApiContext ctx, final String track) {
+    private void loadTrackFromURL(final Core core, final PlayMode mode, final ApiContext ctx, final String track) {
         PlayerHandle.AUDIO_PLAYER_MANAGER.loadItem(track, new FunctionalResultHandler(audioTrack -> {
             switch(mode) {
                 case QUEUE:
@@ -110,8 +113,13 @@ public final class ManagedGuild {
                     queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_QUEUE, ctx, audioTrack.getInfo()));
                     break;
                 case DIRECT_PLAY:
-                    handle.getAudioPlayer().playTrack(audioTrack);
-                    queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_START, ctx, audioTrack.getInfo()));
+                    try {
+                        playlist.setCurrentTrack(new QueuedTrack(track, ctx));
+                        core.getAudioManager(ctx.getGuild()).setSendingHandler(handle);
+                        handle.getAudioPlayer().playTrack(audioTrack);
+                    } catch(Throwable t) {
+                        t.printStackTrace();
+                    }
                     break;
             }
         }, null, () -> {
@@ -119,7 +127,7 @@ public final class ManagedGuild {
         }, null));
     }
     
-    private void loadTrackFromSearch(final PlayMode mode, final ApiContext ctx, final String track) {
+    private void loadTrackFromSearch(final Core core, final PlayMode mode, final ApiContext ctx, final String track) {
         final AtomicInteger counter = new AtomicInteger();
         PlayerHandle.AUDIO_PLAYER_MANAGER.loadItem("ytsearch:" + track, new FunctionalResultHandler(null, e -> {
             // Consume the playlist
@@ -136,7 +144,8 @@ public final class ManagedGuild {
                     break;
                 case DIRECT_PLAY:
                     handle.getAudioPlayer().playTrack(audioTrack);
-                    queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_START, ctx, audioTrack.getInfo()));
+                    core.getAudioManager(ctx.getGuild()).setSendingHandler(handle);
+                    playlist.setCurrentTrack(new QueuedTrack(audioTrack.getInfo().uri, ctx));
                     break;
             }
         }, () -> {

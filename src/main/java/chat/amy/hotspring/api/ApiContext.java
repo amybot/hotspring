@@ -12,10 +12,11 @@ public class ApiContext {
     private final String guild;
     private final String channel;
     private final String botId;
+    private final String userId;
     private final int shardId;
     
     public static ApiContext fromContext(final JSONObject ctx) {
         return new ApiContext(ctx.getString("guild_id"), ctx.getString("channel_id"),
-                ctx.getString("bot_id"), ctx.getInt("shard_id"));
+                ctx.getString("bot_id"), ctx.getString("user_id"), ctx.getInt("shard_id"));
     }
 }

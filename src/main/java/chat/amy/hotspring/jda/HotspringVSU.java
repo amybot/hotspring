@@ -28,6 +28,7 @@ public final class HotspringVSU {
         logger.info("Hotspring guild: " + guildId);
         final String token = content.getString("token");
         final AudioManager audioManager = core.getAudioManager(guildId);
+        // TODO: Ensure not connected
         synchronized(audioManager.CONNECTION_LOCK) {
             try {
                 final AudioWebSocket socket = new AudioWebSocket(audioManager.getListenerProxy(), endpoint, core, guildId,

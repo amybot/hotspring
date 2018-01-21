@@ -4,6 +4,16 @@ A distributed, REST-only* audio server for Discord bots.
 
 *except for the part where you need a queue somewhere
 
+## Configuration
+
+Hotspring accepts the following environment variables to configure it:
+```Bash
+# The hostname of your redis server. Defaults to `127.0.0.1`
+REDIS_HOST="localhost"
+# The password for your redis server. Required. Defaults to `a`
+REDIS_PASS="super-secure-pass"
+```
+
 ## Client implementation
 
 This section will be expanded over time.
@@ -15,8 +25,9 @@ When sending a REST request to a hotspring server, you need to send a track cont
     "ctx": {
       "guild_id": "1234567890",
       "channel_id": "1234456790",
+      "user_id": "1234567890",
       "bot_id": "1234567890",
-      "shard_id": 7 
+      "shard_id": 7
     },
     "rest of event": "goes here"
 }

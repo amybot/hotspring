@@ -8,18 +8,23 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
  * @author amy
  * @since 1/19/18.
  */
 @Component
 public class RedisConfig {
+    private static final String REDIS_HOST = Optional.ofNullable(System.getenv("REDIS_HOST")).orElse("127.0.0.1");
+    private static final String REDIS_PASS = Optional.ofNullable(System.getenv("REDIS_PASS")).orElse("a");
+    
     @Bean
     @Primary
     public JedisConnectionFactory jedisConnectionFactory() {
         final JedisConnectionFactory factory = new JedisConnectionFactory();
-        // TODO: Configurable
-        factory.setPassword("a");
+        factory.setHostName(REDIS_HOST);
+        factory.setPassword(REDIS_PASS);
         return factory;
     }
     

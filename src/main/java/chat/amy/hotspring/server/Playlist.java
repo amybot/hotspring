@@ -4,6 +4,7 @@ import chat.amy.hotspring.api.ApiContext;
 import chat.amy.hotspring.data.RedisHandle;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.Value;
 
 /**
@@ -18,7 +19,8 @@ public class Playlist {
     @Getter
     private final String guildId;
     @Getter
-    private QueuedTrack currentTrack = null;
+    @Setter
+    private QueuedTrack currentTrack;
     
     public void queueTrack(QueuedTrack track) {
         handle.queue(PLAYLIST_QUEUE, track);
