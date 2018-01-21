@@ -1,6 +1,7 @@
 package chat.amy.hotspring.data.event;
 
-import chat.amy.hotspring.data.TrackContext;
+import chat.amy.hotspring.data.ApiContext;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Value;
 
 /**
@@ -8,10 +9,10 @@ import lombok.Value;
  * @since 1/19/18.
  */
 @Value
-@SuppressWarnings("unused")
 public class TrackEvent {
     private final Type t;
-    private final TrackContext d;
+    private final ApiContext ctx;
+    private final AudioTrackInfo info;
     
     public enum Type {
         /**

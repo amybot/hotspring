@@ -47,9 +47,10 @@ In addition to the track context, each endpoint may require specific fields to b
 
   Nothing needed.
 
-- `/connection/track/play`
+- `/connection/track/play`, `connection/track/queue`
   ```JSON
   {
-  "url": "https://url.goes.here/whatever"
+    "url": "https://url.goes.here/whatever"
   }
   ```
+  Note that the URL field may be a search string to search a track on YouTube.

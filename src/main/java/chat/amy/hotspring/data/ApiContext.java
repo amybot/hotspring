@@ -8,14 +8,14 @@ import org.json.JSONObject;
  * @since 1/19/18.
  */
 @Value
-public class TrackContext {
+public class ApiContext {
     private final String guild;
     private final String channel;
     private final String botId;
     private final int shardId;
     
-    public static TrackContext fromContext(final JSONObject ctx) {
-        return new TrackContext(ctx.getString("guild_id"), ctx.getString("channel_id"),
+    public static ApiContext fromContext(final JSONObject ctx) {
+        return new ApiContext(ctx.getString("guild_id"), ctx.getString("channel_id"),
                 ctx.getString("bot_id"), ctx.getInt("shard_id"));
     }
 }

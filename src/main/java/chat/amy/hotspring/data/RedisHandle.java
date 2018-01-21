@@ -18,6 +18,7 @@ import java.util.Optional;
  * @author amy
  * @since 1/19/18.
  */
+@SuppressWarnings({"unchecked", "unused"})
 @Repository
 public class RedisHandle {
     private static final String EVENT_QUEUE = Optional.ofNullable(System.getenv("EVENT_QUEUE")).orElse("event-queueTrackEvent");
@@ -37,10 +38,18 @@ public class RedisHandle {
     }
     
     public void queueTrackEvent(final TrackEvent event) {
-        listOps.rightPush(EVENT_QUEUE, serialize(event));
+        queue(EVENT_QUEUE, event);
     }
     
-    private String serialize(Object obj) {
+    public void queue(final String queue, final Object data) {
+        listOps.rightPush(queue, serialize(data));
+    }
+    
+    public <T> T deque(final String queue, final Class<T> dataClass) {
+        return dataClass.cast(listOps.leftPop(queue));
+    }
+    
+    private String serialize(final Object obj) {
         try {
             return mapper.writeValueAsString(obj);
         } catch(final JsonProcessingException e) {

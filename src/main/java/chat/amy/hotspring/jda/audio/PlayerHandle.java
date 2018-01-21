@@ -9,6 +9,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
+import lombok.Getter;
 import net.dv8tion.jda.audio.AudioSendHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,16 +19,17 @@ import org.slf4j.LoggerFactory;
  * @since 1/19/18.
  */
 public class PlayerHandle extends AudioEventAdapter implements AudioSendHandler {
-    private static final Logger logger = LoggerFactory.getLogger(PlayerHandle.class);
     public static final AudioPlayerManager AUDIO_PLAYER_MANAGER;
-    
-    private final AudioPlayer audioPlayer;
-    private AudioFrame lastFrame;
-    
+    private static final Logger logger = LoggerFactory.getLogger(PlayerHandle.class);
+
     static {
         AUDIO_PLAYER_MANAGER = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerRemoteSources(AUDIO_PLAYER_MANAGER);
     }
+    
+    @Getter
+    private final AudioPlayer audioPlayer;
+    private AudioFrame lastFrame;
     
     public PlayerHandle(final AudioPlayer audioPlayer) {
         this.audioPlayer = audioPlayer;
