@@ -1,7 +1,7 @@
 package chat.amy.hotspring.data;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Value;
+import org.json.JSONObject;
 
 /**
  * @author amy
@@ -9,7 +9,13 @@ import lombok.Value;
  */
 @Value
 public class TrackContext {
-    private final AudioTrackInfo info;
     private final String guild;
     private final String channel;
+    private final String botId;
+    private final int shardId;
+    
+    public static TrackContext fromContext(final JSONObject ctx) {
+        return new TrackContext(ctx.getString("guild_id"), ctx.getString("channel_id"),
+                ctx.getString("bot_id"), ctx.getInt("shard_id"));
+    }
 }
