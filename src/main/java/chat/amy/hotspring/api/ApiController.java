@@ -1,11 +1,11 @@
 package chat.amy.hotspring.api;
 
-import chat.amy.hotspring.data.EventQueue;
+import chat.amy.hotspring.data.RedisHandle;
 import chat.amy.hotspring.data.TrackContext;
 import chat.amy.hotspring.data.event.TrackEvent;
 import chat.amy.hotspring.jda.CoreManager;
 import chat.amy.hotspring.jda.HotspringVSU;
-import chat.amy.hotspring.jda.audio.PlayerHandler;
+import chat.amy.hotspring.jda.audio.PlayerHandle;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static chat.amy.hotspring.data.event.TrackEvent.Type.AUDIO_TRACK_START;
 
 /**
  * @author amy
@@ -44,12 +46,12 @@ public class ApiController {
     @Autowired
     private CoreManager coreManager;
     @Autowired
-    private EventQueue queue;
+    private RedisHandle queue;
     
     @RequestMapping("/")
     public Map<String, String> index() {
         System.out.println(coreManager);
-        System.out.println(PlayerHandler.AUDIO_PLAYER_MANAGER);
+        System.out.println(PlayerHandle.AUDIO_PLAYER_MANAGER);
         final Map<String, String> map = new HashMap<>();
         map.put("version", version);
         return map;
@@ -138,23 +140,23 @@ public class ApiController {
             logger.info("Shard: " + shard);
             logger.info("Attempting load...");
             //noinspection AnonymousInnerClassWithTooManyMethods
-            new Thread(() -> PlayerHandler.AUDIO_PLAYER_MANAGER.loadItem(url, new AudioLoadResultHandler() {
+            new Thread(() -> PlayerHandle.AUDIO_PLAYER_MANAGER.loadItem(url, new AudioLoadResultHandler() {
                 @Override
                 public void trackLoaded(final AudioTrack audioTrack) {
                     logger.info("Track loaded! woo!");
-                    final AudioPlayer audioPlayer = PlayerHandler.AUDIO_PLAYER_MANAGER.createPlayer();
+                    final AudioPlayer audioPlayer = PlayerHandle.AUDIO_PLAYER_MANAGER.createPlayer();
                     logger.info("Created player.");
-                    final PlayerHandler playerHandler = new PlayerHandler(audioPlayer);
+                    final PlayerHandle playerHandle = new PlayerHandle(audioPlayer);
                     logger.info("Created handle");
-                    audioPlayer.addListener(playerHandler);
+                    audioPlayer.addListener(playerHandle);
                     logger.info("Set up listener");
-                    coreManager.getCore(bot, shard).getAudioManager(guild).setSendingHandler(playerHandler);
+                    coreManager.getCore(bot, shard).getAudioManager(guild).setSendingHandler(playerHandle);
                     logger.info("Set up core");
                     audioPlayer.setVolume(10);
                     audioPlayer.playTrack(audioTrack);
                     logger.info("Should be playing!");
                     final TrackContext ctx = new TrackContext(audioTrack.getInfo(), guild, channel);
-                    queue.queue(new TrackEvent(TrackEvent.Type.AUDIO_TRACK_START, ctx));
+                    queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_START, ctx));
                 }
                 
                 @Override

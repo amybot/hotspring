@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
  * @author amy
  * @since 1/19/18.
  */
-public class PlayerHandler extends AudioEventAdapter implements AudioSendHandler {
-    private static final Logger logger = LoggerFactory.getLogger(PlayerHandler.class);
+public class PlayerHandle extends AudioEventAdapter implements AudioSendHandler {
+    private static final Logger logger = LoggerFactory.getLogger(PlayerHandle.class);
     public static final AudioPlayerManager AUDIO_PLAYER_MANAGER;
     
     private final AudioPlayer audioPlayer;
@@ -29,7 +29,7 @@ public class PlayerHandler extends AudioEventAdapter implements AudioSendHandler
         AudioSourceManagers.registerRemoteSources(AUDIO_PLAYER_MANAGER);
     }
     
-    public PlayerHandler(final AudioPlayer audioPlayer) {
+    public PlayerHandle(final AudioPlayer audioPlayer) {
         this.audioPlayer = audioPlayer;
     }
     

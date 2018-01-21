@@ -3,8 +3,6 @@ package chat.amy.hotspring.data;
 import chat.amy.hotspring.data.event.TrackEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +19,10 @@ import java.util.Optional;
  * @since 1/19/18.
  */
 @Repository
-public class EventQueue {
-    private static final String EVENT_QUEUE = Optional.ofNullable(System.getenv("EVENT_QUEUE")).orElse("event-queue");
+public class RedisHandle {
+    private static final String EVENT_QUEUE = Optional.ofNullable(System.getenv("EVENT_QUEUE")).orElse("event-queueTrackEvent");
     @SuppressWarnings("unused")
-    private static final Logger logger = LoggerFactory.getLogger(EventQueue.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedisHandle.class);
     private static final ObjectMapper mapper = new ObjectMapper();
     
     @Autowired
@@ -38,7 +36,7 @@ public class EventQueue {
         listOps = template.opsForList();
     }
     
-    public void queue(final TrackEvent event) {
+    public void queueTrackEvent(final TrackEvent event) {
         listOps.rightPush(EVENT_QUEUE, serialize(event));
     }
     
