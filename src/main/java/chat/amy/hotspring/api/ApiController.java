@@ -83,7 +83,7 @@ public class ApiController {
         final JSONObject data = new JSONObject(body);
         final ApiContext ctx = ApiContext.fromContext(new JSONObject(data.getJSONObject("ctx")));
         final Core core = coreManager.getCore(ctx.getBotId(), ctx.getShardId());
-        ManagedGuild.get(ctx.getGuild(), queue).playTrack(core, data.getString("url"), DIRECT_PLAY);
+        ManagedGuild.get(ctx.getGuild(), queue).playTrack(core, ctx, data.getString("url"), DIRECT_PLAY);
         
         return ImmutableMap.of("playing", true);
     }
@@ -94,7 +94,7 @@ public class ApiController {
         final JSONObject data = new JSONObject(body);
         final ApiContext ctx = ApiContext.fromContext(new JSONObject(data.getJSONObject("ctx")));
         final Core core = coreManager.getCore(ctx.getBotId(), ctx.getShardId());
-        ManagedGuild.get(ctx.getGuild(), queue).playTrack(core, data.getString("url"), QUEUE);
+        ManagedGuild.get(ctx.getGuild(), queue).playTrack(core, ctx, data.getString("url"), QUEUE);
         
         return ImmutableMap.of("playing", true);
     }
