@@ -2,6 +2,7 @@ package chat.amy.hotspring.api;
 
 import chat.amy.hotspring.data.EventQueue;
 import chat.amy.hotspring.data.TrackContext;
+import chat.amy.hotspring.data.event.TrackEvent;
 import chat.amy.hotspring.jda.CoreManager;
 import chat.amy.hotspring.jda.HotspringVSU;
 import chat.amy.hotspring.jda.audio.PlayerHandler;
@@ -153,7 +154,7 @@ public class ApiController {
                     audioPlayer.playTrack(audioTrack);
                     logger.info("Should be playing!");
                     final TrackContext ctx = new TrackContext(audioTrack.getInfo(), guild, channel);
-                    //queue.queue(new TrackEvent(Type.AUDIO_TRACK_START, ctx));
+                    queue.queue(new TrackEvent(TrackEvent.Type.AUDIO_TRACK_START, ctx));
                 }
                 
                 @Override
