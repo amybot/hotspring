@@ -43,7 +43,7 @@ In addition to the track context, each endpoint may require specific fields to b
   }
   ```
 
-- `/connection/close`
+- `/connection/close`, `/connection/pause`
 
   Nothing needed.
 

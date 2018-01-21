@@ -1,6 +1,6 @@
 package chat.amy.hotspring.data.event;
 
-import chat.amy.hotspring.data.ApiContext;
+import chat.amy.hotspring.api.ApiContext;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Value;
 

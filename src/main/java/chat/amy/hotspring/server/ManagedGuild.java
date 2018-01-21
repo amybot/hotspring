@@ -1,6 +1,6 @@
 package chat.amy.hotspring.server;
 
-import chat.amy.hotspring.data.ApiContext;
+import chat.amy.hotspring.api.ApiContext;
 import chat.amy.hotspring.data.RedisHandle;
 import chat.amy.hotspring.data.event.TrackEvent;
 import chat.amy.hotspring.jda.HotspringVSU;
@@ -49,7 +49,7 @@ public final class ManagedGuild {
     
     private static ManagedGuild create(final String guildId, final RedisHandle queue) {
         final AudioPlayer audioPlayer = PlayerHandle.AUDIO_PLAYER_MANAGER.createPlayer();
-        final PlayerHandle handle = new PlayerHandle(audioPlayer);
+        final PlayerHandle handle = new PlayerHandle(guildId, audioPlayer, queue);
         audioPlayer.addListener(handle);
         
         return new ManagedGuild(guildId, handle, queue);
@@ -77,6 +77,10 @@ public final class ManagedGuild {
         return core.getAudioManager(guildId);
     }
     
+    public void pauseTrack() {
+        handle.getAudioPlayer().setPaused(!handle.getAudioPlayer().isPaused());
+    }
+    
     public void playTrack(final Core core, final ApiContext ctx, final String track, final PlayMode mode) {
         pool.execute(() -> {
             try {
@@ -102,7 +106,7 @@ public final class ManagedGuild {
         PlayerHandle.AUDIO_PLAYER_MANAGER.loadItem(track, new FunctionalResultHandler(audioTrack -> {
             switch(mode) {
                 case QUEUE:
-                    playlist.queueTrack(new QueuedTrack(track, ctx.getGuild(), ctx.getChannel()));
+                    playlist.queueTrack(new QueuedTrack(track, ctx));
                     queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_QUEUE, ctx, audioTrack.getInfo()));
                     break;
                 case DIRECT_PLAY:
@@ -127,7 +131,7 @@ public final class ManagedGuild {
             final AudioTrack audioTrack = e.getTracks().get(0);
             switch(mode) {
                 case QUEUE:
-                    playlist.queueTrack(new QueuedTrack(track, ctx.getGuild(), ctx.getChannel()));
+                    playlist.queueTrack(new QueuedTrack(track, ctx));
                     queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_QUEUE, ctx, audioTrack.getInfo()));
                     break;
                 case DIRECT_PLAY:

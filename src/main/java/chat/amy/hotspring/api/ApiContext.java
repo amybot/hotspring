@@ -1,4 +1,4 @@
-package chat.amy.hotspring.data;
+package chat.amy.hotspring.api;
 
 import lombok.Value;
 import org.json.JSONObject;

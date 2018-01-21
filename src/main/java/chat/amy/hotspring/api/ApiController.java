@@ -1,7 +1,8 @@
 package chat.amy.hotspring.api;
 
 import chat.amy.hotspring.data.RedisHandle;
-import chat.amy.hotspring.data.ApiContext;
+import chat.amy.hotspring.data.event.TrackEvent;
+import chat.amy.hotspring.data.event.TrackEvent.Type;
 import chat.amy.hotspring.jda.CoreManager;
 import chat.amy.hotspring.jda.audio.PlayerHandle;
 import chat.amy.hotspring.server.ManagedGuild;
@@ -79,7 +80,7 @@ public class ApiController {
     
     @ResponseBody
     @RequestMapping(value = "/connection/track/play", method = RequestMethod.POST)
-    public Map<String, Object> loadTrack(@RequestBody final String body) {
+    public Map<String, Object> playTrack(@RequestBody final String body) {
         final JSONObject data = new JSONObject(body);
         final ApiContext ctx = ApiContext.fromContext(new JSONObject(data.getJSONObject("ctx")));
         final Core core = coreManager.getCore(ctx.getBotId(), ctx.getShardId());
@@ -95,6 +96,19 @@ public class ApiController {
         final ApiContext ctx = ApiContext.fromContext(new JSONObject(data.getJSONObject("ctx")));
         final Core core = coreManager.getCore(ctx.getBotId(), ctx.getShardId());
         ManagedGuild.get(ctx.getGuild(), queue).playTrack(core, ctx, data.getString("url"), QUEUE);
+        
+        return ImmutableMap.of("playing", true);
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/connection/track/pause", method = RequestMethod.POST)
+    public Map<String, Object> pauseTrack(@RequestBody final String body) {
+        final JSONObject data = new JSONObject(body);
+        final ApiContext ctx = ApiContext.fromContext(new JSONObject(data.getJSONObject("ctx")));
+        ManagedGuild.get(ctx.getGuild(), queue).pauseTrack();
+        queue.queueTrackEvent(new TrackEvent(Type.AUDIO_TRACK_PAUSE, ctx,
+                ManagedGuild.get(ctx.getGuild(), queue).getHandle()
+                        .getAudioPlayer().getPlayingTrack().getInfo()));
         
         return ImmutableMap.of("playing", true);
     }

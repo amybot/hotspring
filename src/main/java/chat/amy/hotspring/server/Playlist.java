@@ -1,6 +1,8 @@
 package chat.amy.hotspring.server;
 
+import chat.amy.hotspring.api.ApiContext;
 import chat.amy.hotspring.data.RedisHandle;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -8,26 +10,29 @@ import lombok.Value;
  * @author amy
  * @since 1/21/18.
  */
-@Value
 @RequiredArgsConstructor
 public class Playlist {
-    private final RedisHandle handle;
-    private final String guildId;
-    
     private static final String PLAYLIST_QUEUE = "%s:playlist-queue";
+    @Getter
+    private final RedisHandle handle;
+    @Getter
+    private final String guildId;
+    @Getter
+    private QueuedTrack currentTrack = null;
     
     public void queueTrack(QueuedTrack track) {
         handle.queue(PLAYLIST_QUEUE, track);
     }
     
     public QueuedTrack getNextTrack() {
-        return handle.deque(PLAYLIST_QUEUE, QueuedTrack.class);
+        final QueuedTrack nextTrack = handle.deque(PLAYLIST_QUEUE, QueuedTrack.class);
+        currentTrack = nextTrack;
+        return nextTrack;
     }
     
     @Value
     public static final class QueuedTrack {
         private final String url;
-        private final String guild;
-        private final String channel;
+        private final ApiContext ctx;
     }
 }
