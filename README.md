@@ -71,3 +71,5 @@ In addition to the track context, each endpoint may require specific fields to b
 
 Hotspring expects to be able to append events to a Redis queue named `event-queue` by default, and clients are *expected* to
 poll this queue for events.
+
+If you don't want to use Redis, feel free to contribute your own queue implementation. 

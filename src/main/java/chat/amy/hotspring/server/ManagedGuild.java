@@ -162,8 +162,8 @@ public final class ManagedGuild {
             // Because #lazy
             //
             // Note that this only sets the "title" and "length" fields.
-            queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_QUEUE, ctx, new AudioTrackInfo("Tracks Queued", "",
-                    tracks.size(), "", false, "")));
+            queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_QUEUE, ctx, new AudioTrackInfo("Tracks Queued", null,
+                    tracks.size(), null, false, null)));
         }, () -> {
             // Couldn't find a track, give up
         }, null));
