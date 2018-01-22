@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -49,7 +50,17 @@ public class RedisHandle {
     }
     
     public <T> T deque(final String queue, final Class<T> dataClass) {
-        return dataClass.cast(listOps.leftPop(queue));
+        try {
+            return mapper.readValue((String) listOps.leftPop(queue), dataClass);
+        } catch(final IOException e) {
+            throw new RuntimeException(e);
+        } catch(final NullPointerException e) {
+            return null;
+        }
+    }
+    
+    public int getQueueSize(final String queue) {
+        return Math.toIntExact(listOps.size(queue));
     }
     
     private String serialize(final Object obj) {

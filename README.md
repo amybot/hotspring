@@ -12,6 +12,8 @@ Hotspring accepts the following environment variables to configure it:
 REDIS_HOST="localhost"
 # The password for your redis server. Required. Defaults to `a`
 REDIS_PASS="super-secure-pass"
+# The name of the event queue in Redis. Defaults to `event-queue`
+EVENT_QUEUE="my-awesome-queue"
 ```
 
 ## Client implementation
@@ -53,14 +55,19 @@ In addition to the track context, each endpoint may require specific fields to b
   }
   ```
 
-- `/connection/close`, `/connection/pause`
+- `/connection/close`, `/connection/pause`, `/connection/queue/start`, `/connection/queue/length`
 
   Nothing needed.
 
-- `/connection/track/play`, `connection/track/queue`
+- `/connection/track/play`, `/connection/queue/add`
   ```JSON
   {
     "url": "https://url.goes.here/whatever"
   }
   ```
   Note that the URL field may be a search string to search a track on YouTube.
+
+### I heard something about a queue...
+
+Hotspring expects to be able to append events to a Redis queue named `event-queue` by default, and clients are *expected* to
+poll this queue for events.

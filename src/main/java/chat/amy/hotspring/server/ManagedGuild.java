@@ -1,6 +1,7 @@
 package chat.amy.hotspring.server;
 
 import chat.amy.hotspring.api.ApiContext;
+import chat.amy.hotspring.api.ApiController;
 import chat.amy.hotspring.data.RedisHandle;
 import chat.amy.hotspring.data.event.TrackEvent;
 import chat.amy.hotspring.jda.HotspringVSU;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -63,8 +65,12 @@ public final class ManagedGuild {
     }
     
     private static String getDomainName(final String url) throws URISyntaxException {
-        final URI uri = new URI(url);
-        return uri.getHost().replaceFirst("www.", "");
+        try {
+            final URI uri = new URI(url);
+            return uri.getHost().replaceFirst("www.", "");
+        } catch(NullPointerException ignored) {
+            throw new URISyntaxException("null", "invalid uri");
+        }
     }
     
     public void openConnection(final Core core, final String session, final JSONObject vsu) {
@@ -105,6 +111,31 @@ public final class ManagedGuild {
         });
     }
     
+    public void startNextTrack(final ApiContext context) {
+        pool.execute(() -> {
+            // TODO: Verify that we're actually connected before starting
+            final QueuedTrack next = playlist.getNextTrack();
+            if(next != null) {
+                try {
+                    final ApiContext ctx = next.getCtx();
+                    final Core core = ApiController.getInstance().getCoreManager().getCore(ctx.getBotId(), ctx.getShardId());
+                    PlayerHandle.AUDIO_PLAYER_MANAGER.loadItem(next.getUrl(), new FunctionalResultHandler(audioTrack -> {
+                        core.getAudioManager(ctx.getGuild()).setSendingHandler(handle);
+                        handle.getAudioPlayer().playTrack(audioTrack);
+                    }, null, () -> {
+                        queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_INVALID, ctx, null));
+                    }, e -> {
+                        queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_INVALID, ctx, null));
+                    }));
+                } catch(Throwable t) {
+                    t.printStackTrace();
+                }
+            } else {
+                queue.queueTrackEvent(new TrackEvent(AUDIO_QUEUE_END, context, null));
+            }
+        });
+    }
+    
     private void loadTrackFromURL(final Core core, final PlayMode mode, final ApiContext ctx, final String track) {
         PlayerHandle.AUDIO_PLAYER_MANAGER.loadItem(track, new FunctionalResultHandler(audioTrack -> {
             switch(mode) {
@@ -113,16 +144,16 @@ public final class ManagedGuild {
                     queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_QUEUE, ctx, audioTrack.getInfo()));
                     break;
                 case DIRECT_PLAY:
-                    try {
-                        playlist.setCurrentTrack(new QueuedTrack(track, ctx));
-                        core.getAudioManager(ctx.getGuild()).setSendingHandler(handle);
-                        handle.getAudioPlayer().playTrack(audioTrack);
-                    } catch(Throwable t) {
-                        t.printStackTrace();
-                    }
+                    playlist.setCurrentTrack(new QueuedTrack(track, ctx));
+                    core.getAudioManager(ctx.getGuild()).setSendingHandler(handle);
+                    handle.getAudioPlayer().playTrack(audioTrack);
                     break;
             }
-        }, null, () -> {
+        }, pl -> {
+            final List<AudioTrack> tracks = pl.getTracks();
+            tracks.forEach(audioTrack -> playlist.queueTrack(new QueuedTrack(audioTrack.getInfo().uri, ctx)));
+            queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_QUEUE, ctx, null));
+        }, () -> {
             // Couldn't find a track, give up
         }, null));
     }

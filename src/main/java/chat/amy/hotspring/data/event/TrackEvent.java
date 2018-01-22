@@ -45,5 +45,9 @@ public class TrackEvent {
          * Track was invalid
          */
         AUDIO_TRACK_INVALID,
+        /**
+         * Queue ended
+         */
+        AUDIO_QUEUE_END,
     }
 }

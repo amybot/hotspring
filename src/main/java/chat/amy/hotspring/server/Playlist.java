@@ -22,12 +22,20 @@ public class Playlist {
     @Setter
     private QueuedTrack currentTrack;
     
+    private String getQueueName() {
+        return String.format(PLAYLIST_QUEUE, guildId);
+    }
+    
     public void queueTrack(QueuedTrack track) {
-        handle.queue(PLAYLIST_QUEUE, track);
+        handle.queue(getQueueName(), track);
+    }
+    
+    public int getLength() {
+        return handle.getQueueSize(getQueueName());
     }
     
     public QueuedTrack getNextTrack() {
-        final QueuedTrack nextTrack = handle.deque(PLAYLIST_QUEUE, QueuedTrack.class);
+        final QueuedTrack nextTrack = handle.deque(getQueueName(), QueuedTrack.class);
         currentTrack = nextTrack;
         return nextTrack;
     }
