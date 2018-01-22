@@ -10,6 +10,7 @@ import chat.amy.hotspring.server.Playlist.QueuedTrack;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.FunctionalResultHandler;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Getter;
 import net.dv8tion.jda.Core;
 import net.dv8tion.jda.manager.AudioManager;
@@ -152,7 +153,17 @@ public final class ManagedGuild {
         }, pl -> {
             final List<AudioTrack> tracks = pl.getTracks();
             tracks.forEach(audioTrack -> playlist.queueTrack(new QueuedTrack(audioTrack.getInfo().uri, ctx)));
-            queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_QUEUE, ctx, null));
+            
+            // So this is kinda retarded, but:
+            // Basically, because I REALLY don't wanna change the way that track events
+            // are constructed, this goes full meme and crams info about how many tracks
+            // were queued into an AudioTrackInfo instance
+            //
+            // Because #lazy
+            //
+            // Note that this only sets the "title" and "length" fields.
+            queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_QUEUE, ctx, new AudioTrackInfo("Tracks Queued", "",
+                    tracks.size(), "", false, "")));
         }, () -> {
             // Couldn't find a track, give up
         }, null));
