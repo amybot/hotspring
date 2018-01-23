@@ -1,6 +1,6 @@
 # hotspring
 
-A distributed, REST-only* audio server for Discord bots.
+A REST-only* audio server for distributed music for Discord bots.
 
 *except for the part where you need a queue somewhere
 
