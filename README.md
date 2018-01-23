@@ -4,6 +4,8 @@ A distributed, REST-only* audio server for Discord bots.
 
 *except for the part where you need a queue somewhere
 
+Licensed under the GNU GPLv3. (c) amy 2018 - present
+
 ## Configuration
 
 Hotspring accepts the following environment variables to configure it:
