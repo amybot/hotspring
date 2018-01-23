@@ -18,6 +18,11 @@ REDIS_PASS="super-secure-pass"
 EVENT_QUEUE="my-awesome-queue"
 ```
 
+## Known issues
+
+ - no support for voice server failover
+ - no support for region changes
+
 ## Client implementation
 
 This section will be expanded over time.
