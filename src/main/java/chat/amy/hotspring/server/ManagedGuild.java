@@ -69,7 +69,7 @@ public final class ManagedGuild {
         try {
             final URI uri = new URI(url);
             return uri.getHost().replaceFirst("www.", "");
-        } catch(NullPointerException ignored) {
+        } catch(final NullPointerException ignored) {
             throw new URISyntaxException("null", "invalid uri");
         }
     }
@@ -123,12 +123,10 @@ public final class ManagedGuild {
                     PlayerHandle.AUDIO_PLAYER_MANAGER.loadItem(next.getUrl(), new FunctionalResultHandler(audioTrack -> {
                         core.getAudioManager(ctx.getGuild()).setSendingHandler(handle);
                         handle.getAudioPlayer().playTrack(audioTrack);
-                    }, null, () -> {
-                        queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_INVALID, ctx, null));
-                    }, e -> {
-                        queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_INVALID, ctx, null));
-                    }));
-                } catch(Throwable t) {
+                    }, null,
+                            () -> queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_INVALID, ctx, null)),
+                            e -> queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_INVALID, ctx, null))));
+                } catch(final Throwable t) {
                     t.printStackTrace();
                 }
             } else {

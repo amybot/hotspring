@@ -66,6 +66,9 @@ public class PlayerHandle extends AudioEventAdapter implements AudioSendHandler 
     
     @Override
     public void onTrackStart(final AudioPlayer player, final AudioTrack track) {
+        if(player.isPaused()) {
+            return;
+        }
         logger.debug("Starting track: " + track.getInfo());
         final Playlist playlist = ManagedGuild.get(guildId, handle).getPlaylist();
         final QueuedTrack currentTrack = playlist.getCurrentTrack();
