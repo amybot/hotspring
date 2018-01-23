@@ -196,7 +196,7 @@ public final class ManagedGuild {
             final AudioTrack audioTrack = e.getTracks().get(0);
             switch(mode) {
                 case QUEUE:
-                    playlist.queueTrack(new QueuedTrack(track, ctx));
+                    playlist.queueTrack(new QueuedTrack(audioTrack.getInfo().uri, ctx));
                     queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_QUEUE, ctx, audioTrack.getInfo()));
                     break;
                 case DIRECT_PLAY:

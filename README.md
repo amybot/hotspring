@@ -22,6 +22,7 @@ EVENT_QUEUE="my-awesome-queue"
 
  - no support for voice server failover
  - no support for region changes
+ - no load-balancing support
 
 ## Client implementation
 
