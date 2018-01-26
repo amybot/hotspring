@@ -63,7 +63,7 @@ In addition to the track context, each endpoint may require specific fields to b
   }
   ```
 
-- `/connection/close`, `/connection/pause`, `/connection/queue/start`, `/connection/queue/length`
+- `/connection/close`, `/connection/pause`, `/connection/queue/start`, `/connection/queue/length`, `/connection/track/current`
 
   Nothing needed.
 

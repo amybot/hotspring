@@ -24,6 +24,7 @@ import chat.amy.hotspring.jda.CoreManager;
 import chat.amy.hotspring.jda.audio.PlayerHandle;
 import chat.amy.hotspring.server.ManagedGuild;
 import com.google.common.collect.ImmutableMap;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import net.dv8tion.jda.Core;
 import net.dv8tion.jda.utils.SimpleLog;
@@ -135,10 +136,9 @@ public class ApiController {
     public Map<String, Object> currentTrack(@RequestBody final String body) {
         final JSONObject data = new JSONObject(body);
         final ApiContext ctx = ApiContext.fromContext(data.getJSONObject("ctx"));
-        ManagedGuild.get(ctx.getGuild(), queue).pauseTrack();
+        final AudioTrack playingTrack = ManagedGuild.get(ctx.getGuild(), queue).getHandle().getAudioPlayer().getPlayingTrack();
         
-        return ImmutableMap.of("info", ManagedGuild.get(ctx.getGuild(), queue).getHandle()
-                .getAudioPlayer().getPlayingTrack().getInfo());
+        return ImmutableMap.of("info", playingTrack.getInfo());
     }
     
     @ResponseBody
