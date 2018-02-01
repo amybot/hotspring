@@ -43,7 +43,7 @@ public class Playlist {
         return String.format(PLAYLIST_QUEUE, guildId);
     }
     
-    public void queueTrack(QueuedTrack track) {
+    public void queueTrack(final QueuedTrack track) {
         handle.queue(getQueueName(), track);
     }
     
@@ -55,6 +55,17 @@ public class Playlist {
         final QueuedTrack nextTrack = handle.deque(getQueueName(), QueuedTrack.class);
         currentTrack = nextTrack;
         return nextTrack;
+    }
+    
+    public void skipAmount(int amount) {
+        while(amount > 0) {
+            getNextTrack();
+            --amount;
+        }
+    }
+    
+    public void deletePlaylist() {
+        handle.delete(String.format(PLAYLIST_QUEUE, guildId));
     }
     
     @Value

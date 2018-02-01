@@ -17,6 +17,7 @@
 
 package chat.amy.hotspring.data;
 
+import chat.amy.hotspring.api.ApiContext;
 import chat.amy.hotspring.data.event.TrackEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -74,6 +75,10 @@ public class RedisHandle {
         } catch(final NullPointerException e) {
             return null;
         }
+    }
+    
+    public void delete(final String queue) {
+        template.delete(queue);
     }
     
     public int getQueueSize(final String queue) {

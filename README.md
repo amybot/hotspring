@@ -74,6 +74,20 @@ In addition to the track context, each endpoint may require specific fields to b
   }
   ```
   Note that the URL field may be a search string to search a track on YouTube.
+  
+- `/connection/queue/skip`
+  Skip a specific number of songs (n > 0)
+  ```JSON
+  {
+    "skip": 1
+  }
+  ```
+  Skip all songs
+  ```JSON
+  {
+    "skip": -1
+  }
+  ```
 
 ### I heard something about a queue...
 

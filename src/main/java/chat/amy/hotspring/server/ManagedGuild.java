@@ -109,6 +109,26 @@ public final class ManagedGuild {
         handle.getAudioPlayer().setPaused(!handle.getAudioPlayer().isPaused());
     }
     
+    public void skipTracks(final ApiContext ctx, int toSkip) {
+        if(toSkip == -1) {
+            // Skip EVERYTHING
+            playlist.deletePlaylist();
+            queue.queueTrackEvent(new TrackEvent(AUDIO_QUEUE_END, ctx, null));
+        } else {
+            // Skip only MOSTLY everything
+            // Ensure sanity cap
+            if(toSkip > 1000) {
+                toSkip = 1000;
+            }
+            if(toSkip > 0) {
+                playlist.skipAmount(toSkip);
+                if(playlist.getLength() == 0) {
+                    queue.queueTrackEvent(new TrackEvent(AUDIO_QUEUE_END, ctx, null));
+                }
+            }
+        }
+    }
+    
     public void playTrack(final Core core, final ApiContext ctx, final String track, final PlayMode mode) {
         pool.execute(() -> {
             try {

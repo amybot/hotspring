@@ -62,7 +62,7 @@ public class ApiController {
         // single player that all of the guild's tracks go through.
         PlayerHandle.AUDIO_PLAYER_MANAGER.setPlayerCleanupThreshold(Long.MAX_VALUE);
     }
-
+    
     @Value("${version}")
     private String version;
     @Getter
@@ -172,5 +172,17 @@ public class ApiController {
         final int len = ManagedGuild.get(ctx.getGuild(), queue).getPlaylist().getLength();
         
         return ImmutableMap.of("length", len);
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/connection/queue/skip", method = RequestMethod.POST)
+    public Map<String, Object> queueSkip(@RequestBody final String body) {
+        final JSONObject data = new JSONObject(body);
+        final ApiContext ctx = ApiContext.fromContext(data.getJSONObject("ctx"));
+        final Core core = coreManager.getCore(ctx.getBotId(), ctx.getShardId());
+        final int toSkip = data.getInt("skip");
+        ManagedGuild.get(ctx.getGuild(), queue).skipTracks(ctx, toSkip);
+        
+        return ImmutableMap.of("skipped", toSkip);
     }
 }
