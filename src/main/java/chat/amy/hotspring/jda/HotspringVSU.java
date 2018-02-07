@@ -40,9 +40,8 @@ public final class HotspringVSU {
     public static void acceptVSU(final Core core, final String sessionId, final JSONObject content) {
         final String guildId = content.getString("guild_id");
         String endpoint = content.getString("endpoint");
-        logger.info("Hotspring got endpoint: " + endpoint);
+        logger.info("Hotspring got endpoint: " + endpoint + " for guild: " + guildId);
         endpoint = endpoint.replace(":80", "");
-        logger.info("Hotspring guild: " + guildId);
         final String token = content.getString("token");
         final AudioManager audioManager = core.getAudioManager(guildId);
         // TODO: Ensure not connected
