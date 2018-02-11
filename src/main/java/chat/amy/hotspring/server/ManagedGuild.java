@@ -45,6 +45,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static chat.amy.hotspring.data.event.TrackEvent.Type.*;
+import static chat.amy.hotspring.server.ManagedGuild.PlayMode.*;
 
 /**
  * @author amy
@@ -134,12 +135,11 @@ public final class ManagedGuild {
             try {
                 final String domainName = getDomainName(track);
                 // Check if it's a YT track
-                if(domainName.equalsIgnoreCase("youtube.com")) {
+                if(domainName.equalsIgnoreCase("youtube.com") || mode == FORCE_PLAY) {
                     // Valid track, do something
                     loadTrackFromURL(core, mode, ctx, track);
                 } else {
                     // Invalid track
-                    // TODO: This will bork radio probably
                     queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_INVALID, ctx, null));
                 }
             } catch(final URISyntaxException e) {
@@ -180,6 +180,21 @@ public final class ManagedGuild {
                     queue.queueTrackEvent(new TrackEvent(AUDIO_TRACK_QUEUE, ctx, audioTrack.getInfo()));
                     break;
                 case DIRECT_PLAY:
+                    try {
+                        final String domainName = getDomainName(track);
+                        if(!domainName.equalsIgnoreCase("youtube.com") && mode == DIRECT_PLAY) {
+                            // Invalid track
+                        } else {
+                            // We're good
+                            playlist.setCurrentTrack(new QueuedTrack(track, ctx));
+                            core.getAudioManager(ctx.getGuild()).setSendingHandler(handle);
+                            handle.getAudioPlayer().playTrack(audioTrack);
+                        }
+                    } catch(final URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case FORCE_PLAY:
                     playlist.setCurrentTrack(new QueuedTrack(track, ctx));
                     core.getAudioManager(ctx.getGuild()).setSendingHandler(handle);
                     handle.getAudioPlayer().playTrack(audioTrack);
@@ -234,5 +249,6 @@ public final class ManagedGuild {
     public enum PlayMode {
         QUEUE,
         DIRECT_PLAY,
+        FORCE_PLAY,
     }
 }

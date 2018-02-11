@@ -67,13 +67,15 @@ In addition to the track context, each endpoint may require specific fields to b
 
   Nothing needed.
 
-- `/connection/track/play`, `/connection/queue/add`
+- `/connection/track/play`, `/connection/track/play/force`, `/connection/queue/add`
   ```JSON
   {
     "url": "https://url.goes.here/whatever"
   }
   ```
   Note that the URL field may be a search string to search a track on YouTube.
+  
+  Note that `/connection/track/play/force` will ignore ALL safety-checks
   
 - `/connection/queue/skip`
   Skip a specific number of songs (n > 0)

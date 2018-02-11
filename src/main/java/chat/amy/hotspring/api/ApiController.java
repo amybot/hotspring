@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static chat.amy.hotspring.server.ManagedGuild.PlayMode.DIRECT_PLAY;
+import static chat.amy.hotspring.server.ManagedGuild.PlayMode.FORCE_PLAY;
 import static chat.amy.hotspring.server.ManagedGuild.PlayMode.QUEUE;
 
 /**
@@ -114,6 +115,17 @@ public class ApiController {
         final ApiContext ctx = ApiContext.fromContext(data.getJSONObject("ctx"));
         final Core core = coreManager.getCore(ctx.getBotId(), ctx.getShardId());
         ManagedGuild.get(ctx.getGuild(), queue).playTrack(core, ctx, data.getString("url"), DIRECT_PLAY);
+        
+        return ImmutableMap.of("playing", true);
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/connection/track/play/force", method = RequestMethod.POST)
+    public Map<String, Object> forcePlayTrack(@RequestBody final String body) {
+        final JSONObject data = new JSONObject(body);
+        final ApiContext ctx = ApiContext.fromContext(data.getJSONObject("ctx"));
+        final Core core = coreManager.getCore(ctx.getBotId(), ctx.getShardId());
+        ManagedGuild.get(ctx.getGuild(), queue).playTrack(core, ctx, data.getString("url"), FORCE_PLAY);
         
         return ImmutableMap.of("playing", true);
     }
